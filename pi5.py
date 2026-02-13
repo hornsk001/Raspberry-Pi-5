@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 import subprocess, platform, glob, os
 
-# Konfiguration
 V, REPO = "0.2", "https://github.com/hornsk001/Raspberry-Pi-5"
-W = 56 # Konstante Innenbreite
+W = 56 
 
-# Farben
 Y = '\033[1;33m'
 G = '\033[0;32m'
 B = '\033[0;34m'
@@ -24,7 +22,6 @@ def get_nvme():
         except: continue
     return "N/A"
 
-# Daten sammeln
 hw = open("/proc/device-tree/model").read().strip('\0')
 kn = platform.release()
 ct = get("vcgencmd measure_temp").replace("temp=","").replace("'C"," C")
@@ -34,12 +31,10 @@ vc = get("vcgencmd measure_volts core").split('=')[1] if '=' in get("vcgencmd me
 fn = f"{get('cat /sys/class/hwmon/hwmon*/fan1_input 2>/dev/null | head -n1') or '0'} RPM"
 st = get("vcgencmd get_throttled").split('=')[1] or "0x0"
 
-# Header & Rahmen
 print(f"{Y}┏" + "━" * (W + 2) + f"┓{N}")
 print(f"{Y}┃{N}{f'Pi5 System Status v{V}':^{W+2}}{Y}┃{N}")
 print(f"{Y}┣" + "━" * (W + 2) + f"┫{N}")
 
-# Reihen-Funktion (Absolut bündig)
 def pr(l, v):
     line = f" {l:<12} : {v}"
     print(f"{Y}┃{N}{line:<{W+2}}{Y}┃{N}")
@@ -54,13 +49,9 @@ pr("Lüfter", fn)
 pr("Status", st)
 
 print(f"{Y}┣" + "━" * (W + 2) + f"┫{N}")
-
-# Status-Zeile ohne Versatz
 status_text = " System Nominal (Integrität OK)" if st in ["0x0", "0"] else " Anomalie detektiert!"
 color = G if st in ["0x0", "0"] else '\033[0;31m'
-# Hier liegt der Trick: Erst formatieren, dann Farbe einfügen
 formatted_status = f"{status_text:<{W+2}}"
 print(f"{Y}┃{N}{color}{formatted_status}{N}{Y}┃{N}")
-
 print(f"{Y}┗" + "━" * (W + 2) + f"┛{N}")
 print(f"Repo: {B}{REPO}{N}")
